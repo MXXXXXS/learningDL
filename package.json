@@ -1,0 +1,16 @@
+{
+  "name": "deep-learning",
+  "version": "1.0.0",
+  "description": "学习深度学习算法",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index"
+  },
+  "author": "mxxxxxs",
+  "license": "MIT",
+  "dependencies": {
+    "d3": "^5.9.2",
+    "math.js": "^1.1.43",
+    "mnist": "^1.1.0"
+  }
+}
