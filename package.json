@@ -4,6 +4,7 @@
   "description": "学习深度学习算法",
   "main": "index.js",
   "scripts": {
+    "test": "node test",
     "start": "node index"
   },
   "author": "mxxxxxs",
