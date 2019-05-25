@@ -1,13 +1,18 @@
-const math = require(`math.js`)
 const fs = require(`fs`)
 const mnist = require(`mnist`)
-const dataSet = mnist.set(4000, 3000)
+const dataSet = mnist.set(2000, 1000)
 
-//正确率: 85.89529843281%
-const trainingTime = 600
+let weights = fs.readFileSync(`weights.json`)
+if (weights) {
+  weights = JSON.parse(weights)
+} else {
+  weights = []
+}
 
+const trainingTime = 500
 // const n = 0.0000000005
 const n = 0.000000001
+
 // const b = 
 // {
 //   input: [0,0,0,1,1, ... ,0,0], // a 784-length array of floats representing each pixel of the 28 x 28 image, normalized between 0 and 1
@@ -44,6 +49,7 @@ class Layer {
   //   b: Number, //偏置
   //   outputSize: Number, //对应下一层神经元数量
   //   n: Number //学习率
+  //   ws: Array  //初始化权重, 可选
   // }
   constructor(opt) {
     if (opt.input.length !== 0 && opt.input[0].length !== 0) {
@@ -54,13 +60,24 @@ class Layer {
         for (let j = 0; j < opt.input.length; j++) {
           inputBuf.push(opt.input[j][i])
         }
-        this.cells.push(new Cell({
-          input: inputBuf,
-          activator: opt.activator,
-          b: opt.b,
-          outputSize: opt.outputSize,
-          n: opt.n
-        }))
+        if (opt.ws) {
+          this.cells.push(new Cell({
+            input: inputBuf,
+            activator: opt.activator,
+            b: opt.b,
+            outputSize: opt.outputSize,
+            n: opt.n,
+            w: opt.ws[i]
+          }))
+        } else {
+            this.cells.push(new Cell({
+              input: inputBuf,
+              activator: opt.activator,
+              b: opt.b,
+              outputSize: opt.outputSize,
+              n: opt.n
+            }))
+        }
       }
     }
   }
@@ -91,6 +108,14 @@ class Layer {
   backward(dOut) {
     return this.cells.map(cell => cell.backward(dOut))
   }
+
+  inputWeights(ws) {
+    ws.forEach((w, i) => this.cells[i].inputWeights(w))
+  }
+
+  outputWeights() {
+    return this.cells.map(cell => cell.outputWeights())
+  }
 }
 
 class Cell {
@@ -101,6 +126,7 @@ class Cell {
   //   b: Number, //偏置
   //   outputSize: Number, //对应下一层神经元数量
   //   n: Number //学习率
+  //   w: Array  //初始化权重, 可选
   // }
   constructor(opt) {
     //input输入为一维数组, 由上一层各个神经元对本神经元的输入构成
@@ -110,11 +136,15 @@ class Cell {
     this.b = opt.b
     this.outputSize = opt.outputSize
     this.n = opt.n
-    //对下一层各个神经元的权重
-    this.weights = []
-    //初始化权重, 取 0~1 之间的随机数
-    for (let i = 0; i < this.outputSize; i++) {
-      this.weights.push(Math.random())
+    //初始化权重
+    if (opt.w) {
+      this.weights = opt.w
+    } else {
+      //对下一层各个神经元的权重
+      this.weights = []
+      for (let i = 0; i < this.outputSize; i++) {
+        this.weights.push(Math.random())
+      }
     }
     //激活函数对输入作用后的值
     this.activated = new this.activator(this.inputSum)
@@ -140,6 +170,14 @@ class Cell {
   //本神经元反向传播时的偏导
   backward(dOut) {
     return dOut.reduce((acc, cur) => acc += cur, 0) * this.activated.backward()
+  }
+
+  inputWeights(w) {
+    this.weights = w
+  }
+
+  outputWeights() {
+    return this.weights
   }
 }
 
@@ -205,7 +243,8 @@ const layer0 = new Layer({
   activator: ReLU,
   b: 0,
   outputSize: 10,
-  n: n
+  n: n,
+  ws: weights[0]
 })
 const output0 = layer0.forward()
 //第一层, 隐藏层
@@ -214,7 +253,8 @@ const layer1 = new Layer({
   activator: ReLU,
   b: 0,
   outputSize: 10,
-  n: n
+  n: n,
+  ws: weights[1]
 })
 const output1 = layer1.forward()
 //第二层, 隐藏层
@@ -223,7 +263,8 @@ const layer2 = new Layer({
   activator: ReLU,
   b: 0,
   outputSize: 10,
-  n: n
+  n: n,
+  ws: weights[2]
 })
 const output2 = layer2.forward()
 const finalOutput = new Out(output2, target, loss, dLoss)
@@ -258,6 +299,16 @@ for (let i = 1; i < trainingSet.length; i++) {
 }
 
 fs.writeFile(`result.txt`, JSON.stringify(losses), err => {
+  if (err) console.error(err)
+})
+
+//收集整个网络的权重
+const saveWeights = []
+saveWeights.push(layer0.outputWeights())
+saveWeights.push(layer1.outputWeights())
+saveWeights.push(layer2.outputWeights())
+//保存该网络各个权重
+fs.writeFile(`weights.json`, JSON.stringify(saveWeights), err => {
   if (err) console.error(err)
 })
 
