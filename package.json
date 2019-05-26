@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "node test",
-    "start": "node index"
+    "start": "node training",
+    "build": "webpack --config webpack.config.js"
   },
   "author": "mxxxxxs",
   "license": "MIT",
   "dependencies": {
-    "d3": "^5.9.2",
-    "math.js": "^1.1.43",
     "mnist": "^1.1.0"
+  },
+  "devDependencies": {
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2"
   }
 }

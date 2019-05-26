@@ -1,15 +1,13 @@
 const fs = require(`fs`)
 const mnist = require(`mnist`)
-const dataSet = mnist.set(2000, 1000)
+const weights = require(`./weights.js`)
+const dataSet = mnist.set(10000, 10000)
 
-let weights = fs.readFileSync(`weights.json`)
-if (weights) {
-  weights = JSON.parse(weights)
-} else {
+if (!weights) {
   weights = []
 }
 
-const trainingTime = 500
+const trainingTime = 800
 // const n = 0.0000000005
 const n = 0.000000001
 
@@ -60,7 +58,7 @@ class Layer {
         for (let j = 0; j < opt.input.length; j++) {
           inputBuf.push(opt.input[j][i])
         }
-        if (opt.ws) {
+        if (opt.ws && opt.ws.length !== 0) {
           this.cells.push(new Cell({
             input: inputBuf,
             activator: opt.activator,
@@ -137,7 +135,7 @@ class Cell {
     this.outputSize = opt.outputSize
     this.n = opt.n
     //初始化权重
-    if (opt.w) {
+    if (opt.w && opt.w.length !== 0) {
       this.weights = opt.w
     } else {
       //对下一层各个神经元的权重
@@ -298,9 +296,9 @@ for (let i = 1; i < trainingSet.length; i++) {
   }
 }
 
-fs.writeFile(`result.txt`, JSON.stringify(losses), err => {
-  if (err) console.error(err)
-})
+// fs.writeFile(`result.txt`, JSON.stringify(losses), err => {
+//   if (err) console.error(err)
+// })
 
 //收集整个网络的权重
 const saveWeights = []
@@ -308,7 +306,7 @@ saveWeights.push(layer0.outputWeights())
 saveWeights.push(layer1.outputWeights())
 saveWeights.push(layer2.outputWeights())
 //保存该网络各个权重
-fs.writeFile(`weights.json`, JSON.stringify(saveWeights), err => {
+fs.writeFile(`weights.js`, `module.exports = ${JSON.stringify(saveWeights)}`, err => {
   if (err) console.error(err)
 })
 
@@ -318,7 +316,9 @@ let wrong = 0
 for (let i = 1; i < testSet.length; i++) {
   let input = testSet[i].input
   let target = testSet[i].output
+  //训练二值图像
   input = [input]
+  // input = [input.map(val => val > 0 ? 1 : 0)]
   layer0.input(input)
   const output0 = layer0.forward()
   layer1.input(output0)

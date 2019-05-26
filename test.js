@@ -1,12 +1,9 @@
-const fs = require(`fs`)
+const weights = require(`./weights.js`)
 const mnist = require(`mnist`)
-const dataSet = mnist.set(2000, 1000)
+const dataSet = mnist.set(0, 10000)
 const testSet = dataSet.test
 
-let weights = fs.readFileSync(`weights.json`)
-if (weights) {
-  weights = JSON.parse(weights)
-} else {
+if (!weights) {
   console.log(`权重输入失败`)
   process.exit()
 }
@@ -164,9 +161,11 @@ const finalOutput = new Out(loss)
 
 let right = 0
 let wrong = 0
+// const ctx = document.querySelector(`.test`).getContexxt(`2d`)
 for (let i = 1; i < testSet.length; i++) {
   let input = testSet[i].input
   let target = testSet[i].output
+  // input = [input.map(val => val > 0 ? 1 : 0)]
   input = [input]
   layer0.input(input)
   const output0 = layer0.forward()
@@ -176,5 +175,9 @@ for (let i = 1; i < testSet.length; i++) {
   const output2 = layer2.forward()
   finalOutput.input(output2, target)
   target[finalOutput.e.indexOf(Math.max(...finalOutput.e))] === 1 ? right++ : wrong++
+  // mnist.draw(input, ctx)
+  // document.querySelector(`.recognized`).innerHTML = finalOutput.e.indexOf(Math.max(...finalOutput.e))
+  
+  // console.log(finalOutput.e.indexOf(Math.max(...finalOutput.e)), target.indexOf(1))
 }
 console.log(`正确率: ${right / (right + wrong) * 100}%`)
