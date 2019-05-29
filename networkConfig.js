@@ -1,6 +1,6 @@
 const network = require(`./network`)
 const weights = require(`./weights`)
-const n = 0.000001
+const n = 0.0001
 module.exports = {
   layers: function() {
     const config = [
@@ -24,7 +24,6 @@ module.exports = {
     return config.map(config => new network.layer(config))
   },
   finalLayer: function() {
-    const lossFn = network.lossFn
-    return new network.out(lossFn)
+    return new network.softMaxWithLoss()
   }
 }

@@ -10,12 +10,14 @@ try {
   networkConfig = require(`./networkConfig.js`)
 } catch (error) {
   console.error(error)
-  console.log(`没有网络载入`)
+  console.log(`没有配置网络载入`)
   process.exit()
 }
 
 const layers = networkConfig.layers()
 const finalLayer = networkConfig.finalLayer()
+
+const sumLoss = []
 
 for (let i = 0; i < trainingSet.length; i++) {
   let input = trainingSet[i].input
@@ -29,6 +31,10 @@ for (let i = 0; i < trainingSet.length; i++) {
     finalLayer.input(layersOutput, target)
     const backward0 = finalLayer.backward()
   
+    if (sumLoss.length > 3000)
+    sumLoss.shift()
+    sumLoss.push(finalLayer.sumLoss())
+
     layers.reverse().reduce((preD, curLayer) => {
       curLayer.update(preD)
       return curLayer.backward(preD)
@@ -40,5 +46,10 @@ for (let i = 0; i < trainingSet.length; i++) {
 //收集并保存整个网络的权重
 const saveWeights = layers.map(layer => layer.outputWs())
 fs.writeFile(`weights.js`, `module.exports = ${JSON.stringify(saveWeights)}`, err => {
+  if (err) console.error(err)
+})
+
+//收集并保存每一轮的总损失
+fs.writeFile(`sumLoss.json`, `${JSON.stringify(sumLoss)}`, err => {
   if (err) console.error(err)
 })

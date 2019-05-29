@@ -1,11 +1,3 @@
-class Loss {
-  constructor(y, t) {
-    this.y = y
-    this.loss = 0.5 * (y - t) ** 2
-    this.d = this.y - t
-  }
-}
-
 class ReLU {
   constructor(x) {
     this.x = x
@@ -122,7 +114,7 @@ class Cell {
   }
 
   backward(d) {
-    return d.reduce((pre, di, i) => pre += di * this.w[i], 0) * this.activated.backward()
+    return d.reduce((pre, di, i) => pre += di * this.w[i], 0) * this.activated.backward() * this.inputSum
   }
 
   outputW() {
@@ -130,9 +122,9 @@ class Cell {
   }
 }
 
-class Out {
-  constructor(lossFn) {
-    this.lossFn = lossFn
+class SoftMaxWithLoss {
+  constructor() {
+
   }
 
   input(input, target) {
@@ -144,24 +136,34 @@ class Out {
       }
       inputT.push(buf)
     }
-    const flatInput = inputT.map(y => y.reduce((acc, cur) => acc += cur, 0))
-    this.output = flatInput.indexOf(Math.max(...flatInput))
-    if (target)
-    this.results = flatInput.map((y, i) => new this.lossFn(y, target[i]))
+
+    let a = inputT.map(val => val.reduce((pre, cur) => pre += cur, 0))
+    const max = Math.max(...a)
+    a = a.map(val => val - max)
+    const sumA = a.reduce((pre, cur) => pre += Math.exp(cur), 0)
+    this.y = a.map(a => Math.exp(a) / sumA)
+    this.t = target
   }
 
-  loss() {
-    return this.results.reduce((acc, cur) => acc += cur.loss, 0)
+  ys() {
+    return this.y
+  }
+
+  output() {
+    return this.y.indexOf(Math.max(...this.y))
   }
 
   backward() {
-    return this.results.map(lossFn => lossFn.d)
+    return this.y.map((y, i) => y - this.t[i])
+  }
+
+  sumLoss() {
+    return this.y.reduce((pre, y, i) => pre += -1 * this.t[i] * Math.log(y), 0)
   }
 }
 
 module.exports = {
   layer: Layer,
-  out: Out,
   activator: ReLU,
-  lossFn: Loss
+  softMaxWithLoss: SoftMaxWithLoss
 }
