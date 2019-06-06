@@ -114,7 +114,7 @@ class Cell {
   }
 
   backward(d) {
-    return d.reduce((pre, di, i) => pre += di * this.w[i], 0) * this.activated.backward() * this.inputSum
+    return d.reduce((pre, di, i) => pre += di * this.w[i], 0) * this.activated.backward()
   }
 
   outputW() {

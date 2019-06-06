@@ -14,7 +14,7 @@ let right = 0
 let wrong = 0
 const layers = networkConfig.layers()
 const finalLayer = networkConfig.finalLayer()
-for (let i = 1; i < testSet.length; i++) {
+for (let i = 0; i < testSet.length; i++) {
   let input = testSet[i].input
   let target = testSet[i].output
   // input = [input.map(val => val > 0 ? 1 : 0)]

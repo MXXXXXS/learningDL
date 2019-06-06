@@ -19,10 +19,10 @@ const finalLayer = networkConfig.finalLayer()
 
 const sumLoss = []
 
+for (let j = 0; j < trainingTime; j++) {
 for (let i = 0; i < trainingSet.length; i++) {
   let input = trainingSet[i].input
   let target = trainingSet[i].output
-  for (let j = 0; j < trainingTime; j++) {
     const layersOutput = layers.reduce((preLayer, curLayer) => {
        curLayer.input(preLayer)
        return curLayer.forward()
