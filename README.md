@@ -11,14 +11,14 @@ demo性质的mnist数据集手写数字识别的神经网络, 不借助外部库
 - 求偏导方式: 反向传播
 - 损失函数: SoftmaxWithLoss
 
-***19.6.6 更新: 之前的代码都是有问题的, 真正跑通是在这次更新***
+***19.6.8 更新: 之前的代码都是有问题的, 真正跑通是在这次更新***
 
 文件说明
 
 - network.js: 网络的实现
 - networkConfig.js 网络的配置
 - weights.js 保存整个网络的所有权重
-- traning.js 用来训练网络
+- training.js 用来训练网络
 - test.js 用来测试网络训练结果
 - sumLoss.json 用来观察最后3000(training.js中配置)个损失函数值
 
