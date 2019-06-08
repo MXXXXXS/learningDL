@@ -1,5 +1,5 @@
 const mnist = require(`mnist`)
-const dataSet = mnist.set(0, 10)
+const dataSet = mnist.set(0, 1000)
 const testSet = dataSet.test
 
 let networkConfig
@@ -17,15 +17,15 @@ const finalLayer = networkConfig.finalLayer()
 for (let i = 0; i < testSet.length; i++) {
   let input = testSet[i].input
   let target = testSet[i].output
-  // input = [input.map(val => val > 0 ? 1 : 0)]
-  input = [input]
+  input = [input.map(val => val > 0 ? 1 : 0)]
+  // input = [input]
   
   const layersOutput = layers.reduce((preLayer, curLayer) => {
     curLayer.input(preLayer)
     return curLayer.forward()
-  }, [input])
+  }, input)
   finalLayer.input(layersOutput, target)
-  console.log(finalLayer.ys() + `: ` + target)
+  // console.log(finalLayer.ys() + `: ` + target)
   target[finalLayer.output()] === 1 ? right++ : wrong++
 }
 console.log(`正确率: ${right / (right + wrong) * 100}%`)

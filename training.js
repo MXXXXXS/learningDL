@@ -1,8 +1,8 @@
 const fs = require(`fs`)
 const mnist = require(`mnist`)
 
-const trainingTime = 200
-const dataSet = mnist.set(1000, 1000)
+const trainingTime = 400
+const dataSet = mnist.set(10000, 0)
 const trainingSet = dataSet.training
 
 let networkConfig
