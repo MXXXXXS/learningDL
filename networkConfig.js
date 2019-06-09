@@ -8,26 +8,18 @@ module.exports = {
       cellsNum: 784,
       activator: network.activator,
       b: 0,
-      outputSize: 10,
+      outputSize: 40,
       n: n,
       ws: weights[0]
     },
-    // {
-    //   cellsNum: 10,
-    //   activator: network.activator,
-    //   b: 0,
-    //   outputSize: 10,
-    //   n: n,
-    //   ws: weights[1]
-    // },
-    // {
-    //   cellsNum: 10,
-    //   activator: network.activator,
-    //   b: 0,
-    //   outputSize: 10,
-    //   n: n,
-    //   ws: weights[2]
-    // },
+    {
+      cellsNum: 40,
+      activator: network.activator,
+      b: 0,
+      outputSize: 10,
+      n: n,
+      ws: weights[1]
+    },
   ]
     return config.map(config => new network.layer(config))
   },

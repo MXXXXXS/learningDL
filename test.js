@@ -1,5 +1,5 @@
 const mnist = require(`mnist`)
-const dataSet = mnist.set(0, 1000)
+const dataSet = mnist.set(0, 2000)
 const testSet = dataSet.test
 
 let networkConfig

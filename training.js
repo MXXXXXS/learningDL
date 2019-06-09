@@ -1,9 +1,12 @@
 const fs = require(`fs`)
 const mnist = require(`mnist`)
+const Progress = require(`progress`)
 
 const trainingTime = 400
-const dataSet = mnist.set(10000, 0)
+const trainingSetAmount = 6000
+const dataSet = mnist.set(trainingSetAmount, 0)
 const trainingSet = dataSet.training
+const bar = new Progress(`Progress: :current/:total | Estimated completion time: :eta s`, { total: trainingTime })
 
 let networkConfig
 try {
@@ -20,19 +23,19 @@ const finalLayer = networkConfig.finalLayer()
 const sumLoss = []
 
 for (let j = 0; j < trainingTime; j++) {
-for (let i = 0; i < trainingSet.length; i++) {
-  let input = trainingSet[i].input
-  let target = trainingSet[i].output
+  for (let i = 0; i < trainingSet.length; i++) {
+    let input = trainingSet[i].input
+    let target = trainingSet[i].output
     const layersOutput = layers.reduce((preLayer, curLayer) => {
-       curLayer.input(preLayer)
-       return curLayer.forward()
+      curLayer.input(preLayer)
+      return curLayer.forward()
     }, [input])
 
     finalLayer.input(layersOutput, target)
     const backward0 = finalLayer.backward()
-  
+
     if (sumLoss.length > 3000)
-    sumLoss.shift()
+      sumLoss.shift()
     sumLoss.push(finalLayer.sumLoss())
 
     layers.reverse().reduce((preD, curLayer) => {
@@ -41,6 +44,7 @@ for (let i = 0; i < trainingSet.length; i++) {
     }, backward0)
     layers.reverse()
   }
+  bar.tick()
 }
 
 //收集并保存整个网络的权重

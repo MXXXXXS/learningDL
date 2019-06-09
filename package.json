@@ -10,7 +10,8 @@
   "author": "mxxxxxs",
   "license": "MIT",
   "dependencies": {
-    "mnist": "^1.1.0"
+    "mnist": "^1.1.0",
+    "progress": "^2.0.3"
   },
   "devDependencies": {}
 }
